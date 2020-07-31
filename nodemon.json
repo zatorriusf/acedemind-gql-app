@@ -1,0 +1,7 @@
+{
+    "env" : {
+        "MONGO_USER": "bookings_app",
+        "MONGO_PASSWORD" : "3w4gJao0xQxYsyjQ",
+        "MONGO_DB" : "bookings_app_dev"
+    }
+}
