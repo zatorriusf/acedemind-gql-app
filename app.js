@@ -17,6 +17,17 @@ app.get("/", (req, res, next) => {
   res.send("Hello World!");
   next();
 });
+const events = eventIds => {
+  return Event.find({ _id : { $in: eventIds }})
+    .then((evts) => {
+      return evts.map((evt) => {
+        return { ...evt._doc, creator: user.bind(this,evt.creator)};
+      });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
 
 const user = (userId) => {
   return User.findById(userId)
@@ -31,17 +42,7 @@ const user = (userId) => {
     });
 };
 
-const events = eventIds => {
-  return Event.find({ _id: { $in: eventIds }})
-    .then((evts) => {
-      evts.map((evt) => {
-        return { ...evt._doc, creator: 'balls' };
-      });
-    })
-    .catch((err) => {
-      throw err;
-    });
-};
+
 
 app.use(
   "/graphql",
@@ -94,7 +95,7 @@ app.use(
             return e.map((obj) => {
               return {
                 ...obj._doc,
-                creator: user.bind(this, obj._doc.creator),
+                creator: user.bind(this, obj._doc.creator)
               };
             });
           })
@@ -115,7 +116,7 @@ app.use(
         return evt
           .save()
           .then((res) => {
-            createdEvent = { ...res._doc };
+            createdEvent = { ...res._doc, creator: user.bind(this,res._doc.creator) };
             return User.findById("5f21d63c5cf3e2c9508468ff");
           })
           .then((user) => {
