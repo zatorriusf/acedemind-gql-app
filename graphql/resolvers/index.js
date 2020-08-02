@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 //importing models
 const Event = require("../../models/event");
 const User = require("../../models/users");
+const Booking = require('../../models/bookings');
 
 const events = eventIds => {
     return Event.find({ _id : { $in: eventIds }})
@@ -16,7 +17,7 @@ const events = eventIds => {
       });
   };
   
-  const user = (userId) => {
+const user = (userId) => {
     return User.findById(userId)
       .then((user) => {
         return {
@@ -29,7 +30,34 @@ const events = eventIds => {
       });
   };
 
+const singleEvent = eventId => {
+    return Event.findOne(eventId)
+        .then(evt =>{
+            return {...evt._doc,
+                creator: user.bind(this,evt.creator),
+                date: new Date(evt._doc.date).toISOString()
+            }
+        })
+        .catch(err => {throw err;})
+        
+};
+
 module.exports = {
+    bookings: () =>{
+        return Booking.find()
+            .then(bookings =>{
+                return bookings.map(booking =>{
+                   return {...booking._doc,
+                    event : singleEvent.bind(this,booking._doc.event),
+                    user : user.bind(this,booking._doc.user),
+                    createdAt : new Date(booking._doc.createdAt).toISOString(),
+                    updatedAt : new Date(booking._doc.updatedAt).toISOString()
+                    }; 
+                })
+            }).catch(err => {
+                throw err;
+            })
+    },
     events: () => {
       return Event.find()
         .then((e) => {
@@ -99,4 +127,28 @@ module.exports = {
           throw err;
         });
     },
+    bookEvent :(args) =>{
+        const booking = new Booking({
+            user: '5f21d63c5cf3e2c9508468ff',
+            event: args.eventId
+        });
+        return booking.save()
+            .then(res => {
+                return {...res._doc,
+                    createdAt : new Date(booking._doc.createdAt).toISOString(),
+                    updatedAt : new Date(booking._doc.updatedAt).toISOString()
+                }
+            })
+
+    },
+    cancelBooking :async args =>{
+        try {
+            const booking = await Booking.findById(args.bookingId);
+            const event = singleEvent(booking._doc.event);
+            await Booking.deleteOne({_id: args.bookingId});
+            return event;
+        } catch (err) {
+            throw err;
+        }
+    }
   }
