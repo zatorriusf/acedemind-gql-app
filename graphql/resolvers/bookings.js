@@ -5,7 +5,10 @@ const Booking = require('../../models/bookings');
 
 
 module.exports = {
-    bookings: () =>{
+    bookings: (req) =>{
+        if(!req.isAuth){
+            throw new Error('User unauthenticated!')
+          }
         return Booking.find()
             .then(bookings =>{
                 return bookings.map(booking =>{
@@ -15,9 +18,12 @@ module.exports = {
                 throw err;
             })
     },
-    bookEvent :(args) =>{
+    bookEvent :(args,req) =>{
+        if(!req.isAuth){
+            throw new Error('User unauthenticated!')
+          }
         const booking = new Booking({
-            user: '5f21d63c5cf3e2c9508468ff',
+            user: req.userId,
             event: args.eventId
         });
         return booking.save()
@@ -29,7 +35,10 @@ module.exports = {
             })
 
     },
-    cancelBooking :async args =>{
+    cancelBooking :async (args,req) =>{
+        if(!req.isAuth){
+            throw new Error('User unauthenticated!')
+          }
         try {
             const booking = await Booking.findById(args.bookingId);
             const event = singleEvent(booking._doc.event);
