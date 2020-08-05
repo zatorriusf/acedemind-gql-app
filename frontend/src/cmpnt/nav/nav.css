@@ -1,0 +1,39 @@
+.main-nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 3.5rem;
+    background-color: #01d1d3;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+
+}
+
+.main-nav__logo h1{
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.main-nav__items{
+    margin-left: 1.5rem;
+}
+.main-nav__items ul{
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.main-nav__items ul li{
+    margin: 0 1rem;
+}
+.main-nav a{
+    text-decoration: none;
+    color: #181818;
+}
+.main-nav a:hover,
+.main-nav a:active,
+.main-nav a.active{
+    color: #7a7a7a;
+}
