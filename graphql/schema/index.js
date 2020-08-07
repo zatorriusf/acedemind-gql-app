@@ -20,6 +20,7 @@ type Event {
 input inputEvent {
     title: String!,
     desc: String!,
+    date: String!,
     price: Float!
 }
 

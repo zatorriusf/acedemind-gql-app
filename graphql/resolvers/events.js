@@ -26,7 +26,7 @@ module.exports = {
         title: args.eventInput.title,
         desc: args.eventInput.desc,
         price: +args.eventInput.price,
-        date: new Date().toISOString(),
+        date: args.eventInput.date,
         creator: req.userId,
       });
 
@@ -34,7 +34,7 @@ module.exports = {
         .save()
         .then((res) => {
           createdEvent =  transformEvent(res);
-          return User.findById("5f21d63c5cf3e2c9508468ff");
+          return User.findById(req.userId);
         })
         .then((user) => {
           user.createdEvents.push(evt._id);
