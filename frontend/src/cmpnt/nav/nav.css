@@ -24,16 +24,28 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    align-items: center;
 }
 .main-nav__items ul li{
     margin: 0 1rem;
+    
 }
-.main-nav a{
+.main-nav__items a,
+.main-nav__items button{
     text-decoration: none;
     color: #181818;
+    padding: .25rem .5rem;
+    border: none;
+    font: inherit;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    margin: 0
 }
-.main-nav a:hover,
-.main-nav a:active,
-.main-nav a.active{
+.main-nav__items a:hover,
+.main-nav__items a:active,
+.main-nav__items a.active,
+.main-nav__items button:hover,
+.main-nav__items button:active{
     color: #7a7a7a;
 }

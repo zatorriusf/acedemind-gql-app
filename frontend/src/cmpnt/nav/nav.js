@@ -16,7 +16,11 @@ export default function Nav(props) {
                         <ul>
                            {!context.state.token && <li><NavLink to='/Auth'>Auth</NavLink></li>}
                             <li><NavLink to='/Events'>Events</NavLink></li>
-                            {context.state.token &&<li><NavLink to='/Bookings'>Bookings</NavLink></li>}
+                            {context.state.token &&(
+                                <>
+                                    <li><NavLink to='/Bookings'>Bookings</NavLink></li>
+                                    <button onClick={()=>{context.dispatch({type: "LOGOUT"})}}>Logout</button>
+                                </>)}
                         </ul>
                     </nav>
                 </header>        
