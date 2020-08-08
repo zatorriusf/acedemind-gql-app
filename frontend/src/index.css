@@ -13,7 +13,8 @@ body {
   margin-bottom: .5rem;
 }
 .form-control label,
-.form-control input {
+.form-control input,
+.form-control textarea {
   width: 100%;
   display: block;
 }
