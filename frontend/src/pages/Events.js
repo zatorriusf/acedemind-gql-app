@@ -1,13 +1,19 @@
 import React , {useState, useRef, useContext, useLayoutEffect}from 'react';
 import Modal from '../cmpnt/modal/Modal'
 import Backdrop from '../cmpnt/backdrop/Backdrop'
+import EventList from '../cmpnt/events/EventList'
+import Spinner from '../cmpnt/spinner/Spinner'
 import AuthContext from '../context/auth-context';
+
 import './Events.css'
 
 export default function Events() {
 
     const [modalState, setModalState] = useState(false);
-    const [existingEvents, setExistingEvents] = useState([{title : 'loading'}]);
+    const [loadingEvents, setLoadingEvents] = useState(false);
+    const [existingEvents, setExistingEvents] = useState([]);
+    const [eventDetail, setEventDetail] = useState();
+
     const titleEl = useRef();
     const priceEl = useRef();
     const dateEl  = useRef();
@@ -18,7 +24,8 @@ export default function Events() {
         setModalState(!modalState);
     }
     const modalCancel = () => {
-        setModalState(!modalState);
+        setModalState(false);
+        setEventDetail(null);
     }
     const modalConfirm = () =>{
         const title = titleEl.current.value.trim();
@@ -71,8 +78,21 @@ export default function Events() {
                     return res.json();
                 }
             ).then(data => {
-                console.log(data);
-                fetchEvents();
+                const newEvent = {
+                    _id : data.data.createEvent._id,
+                    title : data.data.createEvent.title,
+                    price : data.data.createEvent.price,
+                    desc : data.data.createEvent.desc,
+                    date : data.data.createEvent.date,
+                    creator : {
+                        _id : context.state.userId
+                    }
+                };
+                console.log(newEvent)
+                const updatedEvents =[...existingEvents];
+                updatedEvents.push(newEvent);
+                setExistingEvents(updatedEvents);
+
             })
              .catch(err => {throw err;})
 
@@ -80,6 +100,7 @@ export default function Events() {
     }
 
     const fetchEvents = () =>{
+        setLoadingEvents(true);
         const requestBody = {
             query : `
             query {
@@ -114,11 +135,20 @@ export default function Events() {
                 }
             ).then(data => {
                 const events = data.data.events;
-                console.log(events)
                 setExistingEvents(events);
+                setLoadingEvents(false);
             })
-             .catch(err => {throw err;})
+             .catch(err => {
+                setLoadingEvents(false);
+                 throw err;
+                })
              
+    }
+
+    const viewDetails = (id) => {
+        const selectedEvent = existingEvents.find(event => event._id === id);
+        setEventDetail(selectedEvent);
+
     }
     useLayoutEffect(fetchEvents,[]);
     return (
@@ -128,7 +158,13 @@ export default function Events() {
             <button className="btn" onClick={startEventModal}> Add Event</button>
         </div>}
         {modalState && <Backdrop />}
-        {modalState && <Modal title="Add Event" canCancel canConfirm modalCancel = {modalCancel} modalConfirm = {modalConfirm}>
+        {modalState && <Modal title="Add Event" 
+                                canCancel 
+                                cancelText = 'Cancel'
+                                modalCancel = {modalCancel} 
+                                canConfirm 
+                                confirmText = 'Create Event'
+                                modalConfirm = {modalConfirm}>
                 <form>
                     <div className='form-control'>
                         <label htmlFor='title'>Title</label>
@@ -148,10 +184,21 @@ export default function Events() {
                     </div>
                 </form>
             </Modal>}
+            {eventDetail && <>
+                <Backdrop />
+                <Modal title={eventDetail.title}
+                        canCancel 
+                        cancelText = 'Return to Event List'
+                        modalCancel = {modalCancel}>
+                    <h2>${eventDetail.price.toFixed(2)}</h2>
+                    <h3>{new Date(eventDetail.date).toLocaleDateString()}</h3>
+                    <p>{eventDetail.desc}</p>
 
-        <ul className="events__list">
-            {existingEvents.map(event => <li key={event._id} className='events__list-item' >{event.title}</li> )}
-        </ul>
+                </Modal>
+            </>}
+            {loadingEvents && <Spinner />}
+            {!loadingEvents &&<EventList events={existingEvents} authUser ={context.state.userId} viewDetails={viewDetails}/> }
+           
         </>
     )
 }
