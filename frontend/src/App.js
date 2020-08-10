@@ -46,6 +46,7 @@ function App(props) {
       <main className='main-content'>
         <Switch>
         {!loginState.token && <Redirect from="/" to='/auth' exact />}
+        {!loginState.token && <Redirect from="/bookings" to='/auth' exact />}
         {!loginState.token && <Route path="/auth" component={Auth} />}
         {loginState.token && <Redirect from="/" to='/events' exact />}
         {loginState.token && <Redirect from="/auth" to='/events' exact />}

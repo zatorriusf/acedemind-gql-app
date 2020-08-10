@@ -44,7 +44,8 @@ input inputUser{
 
 type RootQuery{
     events : [Event!]!,
-    bookings : [Booking!]!
+    bookings : [Booking!]!,
+    bookingsbyUser(userId: ID!) : [Booking!]!,
     login(email: String!, password: String!) : authUser!
 }
 type RootMutation {

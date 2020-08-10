@@ -18,6 +18,18 @@ module.exports = {
                 throw err;
             })
     },
+    bookingsbyUser: (args,req)  =>{
+        if(!req.isAuth){
+            throw new Error('User unauthenticated!')
+          }
+          return Booking.find({user : args.userId}).then(bookings =>{
+            return bookings.map(booking =>{
+               return transformBooking(booking); 
+            })
+        }).catch(err => {
+            throw err;
+        })
+    },
     bookEvent :(args,req) =>{
         if(!req.isAuth){
             throw new Error('User unauthenticated!')

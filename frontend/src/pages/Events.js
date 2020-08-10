@@ -25,7 +25,7 @@ export default function Events() {
         setModalState(false);
         setEventDetail(null);
     }
-    const modalConfirm = () =>{
+    const modalConfirmEvent = () =>{
         const title = titleEl.current.value.trim();
         const desc  = descEl.current.value.trim();
         const price = +priceEl.current.value;
@@ -148,6 +148,55 @@ export default function Events() {
         setEventDetail(selectedEvent);
 
     }
+
+    const modalConfirmBooking = () => {
+        if(!context.state.token){
+            setEventDetail(null);
+            return;
+        }
+        const requestBody = {
+            query : `
+                mutation {
+                    bookEvent(eventId : "${eventDetail._id}"){
+                        _id
+                        event{
+                            title
+                            price
+                            date
+                        }
+                        user{
+                            _id
+                            email
+                        }
+                    }
+                }
+            `
+        }
+
+        fetch('http://localhost:4000/graphql',{
+                method: 'POST',
+                body: JSON.stringify(requestBody),
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'Authorization': `Bearer ${context.state.token}`
+                }
+            }).then(
+                res => {
+                    if(res.status !== 200 && res.status !==201){
+                        console.log(res);
+                    }
+                    return res.json();
+                }
+            ).then(data => {
+                console.log(data);
+                setEventDetail(null);
+            })
+             .catch(err => {
+                 throw err;
+                 setEventDetail(null);
+                })
+    }
+
     useLayoutEffect(fetchEvents,[]);
     return (
         <>
@@ -162,7 +211,7 @@ export default function Events() {
                                 modalCancel = {modalCancel} 
                                 canConfirm 
                                 confirmText = 'Create Event'
-                                modalConfirm = {modalConfirm}>
+                                modalConfirm = {modalConfirmEvent}>
                 <form>
                     <div className='form-control'>
                         <label htmlFor='title'>Title</label>
@@ -187,7 +236,10 @@ export default function Events() {
                 <Modal title={eventDetail.title}
                         canCancel 
                         cancelText = 'Return to Event List'
-                        modalCancel = {modalCancel}>
+                        modalCancel = {modalCancel}
+                        canConfirm
+                        confirmText = 'Book Event'
+                        modalConfirm = {modalConfirmBooking}>
                     <h2>${eventDetail.price.toFixed(2)}</h2>
                     <h3>{new Date(eventDetail.date).toLocaleDateString()}</h3>
                     <p>{eventDetail.desc}</p>
