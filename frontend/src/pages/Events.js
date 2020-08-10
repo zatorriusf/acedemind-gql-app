@@ -5,8 +5,6 @@ import EventList from '../cmpnt/events/EventList'
 import Spinner from '../cmpnt/spinner/Spinner'
 import AuthContext from '../context/auth-context';
 
-import './Events.css'
-
 export default function Events() {
 
     const [modalState, setModalState] = useState(false);
