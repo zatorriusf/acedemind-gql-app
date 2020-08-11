@@ -4,7 +4,8 @@ const User = require('../../models/users');
 const DataLoaer = require('dataloader');
 
 const eventLoader = new DataLoaer((eventIds) => {
-  return events(eventIds);
+  //return events(eventIds);
+  return Event.find({_id : {$in : eventIds}})
 });
 const userLoader = new DataLoaer((userIds) =>{
   return User.find({_id: {$in: userIds}});
@@ -25,37 +26,42 @@ const transformBooking = booking =>{
     };
 }
 
-const events = eventIds => {
-    return Event.find({ _id : { $in: eventIds }})
-      .then((evts) => {
-        return evts.map((evt) => {
-          return transformEvent(evt);
-        });
-      })
-      .catch((err) => {
-        throw err;
-      });
+const events = async eventIds => {
+  try{
+    const events = await Event.find({ _id : { $in: eventIds }});
+    events.map((evt) => {
+      return transformEvent(evt);
+    });
+  }catch (err) {
+    throw err
+  }
+
   };
   
-const user = (userId) => {
-    return userLoader.load(userId.toString())
-      .then((user) => {
-        return {
-          ...user._doc,
-          createdEvents: events.bind(this, user.createdEvents)
-        };
-      })
-      .catch((err) => {
-        throw err;
-      });
+const user = async userId => {
+  try{
+    const user = await userLoader.load(userId.toString());
+    return {...user._doc,
+      createdEvents: events.bind(this, user.createdEvents)
+    }
+  } catch(err){
+    throw err;
+  }
+
   };
 
 const singleEvent = async eventId => {
-     return eventLoader.load(eventId.toString())
+  try{
+    const event = eventLoader.load(eventId.toString());
+    return event;
+  } catch (err){
+    throw err;
+  }
+     /*return eventLoader.load(eventId.toString())
         .then(evt =>{
             return evt;
         })
-        .catch(err => {throw err;})
+        .catch(err => {throw err;})*/
         
 };
 
