@@ -1,4 +1,4 @@
-.event__list-item {
+.booking-list__item {
     display: flex;
     margin: 1rem 0;
     padding: 1rem;
@@ -7,14 +7,14 @@
     justify-content: space-between;
     align-items: center;
 }
-.event__list-item h3{
+.booking-list__item h3{
     margin: 0;
     color: #01d1d3;
 }
-.event__list-item h4{
+.booking-list__item h4{
     margin: 0;
     color: #999;
 }
-.event__list-item p{
+.booking-list__item p{
     margin: 0;
 }

@@ -1,6 +1,7 @@
 import React, {useState,useContext,useLayoutEffect} from 'react';
-import EventList from '../cmpnt/events/EventList';
+import BookingList from '../cmpnt/bookings/bookingList'
 import Backdrop from '../cmpnt/backdrop/Backdrop';
+import Spinner from '../cmpnt/spinner/Spinner'
 import Modal from '../cmpnt/modal/Modal';
 import AuthContext from '../context/auth-context';
 
@@ -18,14 +19,17 @@ export default function Booking() {
                     bookingsbyUser(userId:"${context.state.userId}"){
                         _id
                         event{
+                          _id
                           title
+                          price
+                          date
+                          desc
                         }
                       }
                 }
                 
             `
         }
-        console.log(context.state.token)
         fetch('http://localhost:4000/graphql',{
                 method: 'POST',
                 body: JSON.stringify(requestBody),
@@ -36,19 +40,13 @@ export default function Booking() {
             }).then(
                 res => {
                     if(res.status !== 200 && res.status !==201){
-                        if(res.status === 500){
-                            console.log('getting a 500 error which is dumb');
-                            console.log('current token : ',context.state.token);
-                            console.log('current logged user : ', context.state.userId)
-
-                        } else{
+                        
                         console.log(res);
-                        }                        
+                                             
                     }
                     return res.json();
                 }
             ).then(data => {
-                console.log(data);
                 const bookings = data.data.bookingsbyUser;
                 setCurrentBookings(bookings);
                 setLoadingBookings(false);
@@ -58,11 +56,68 @@ export default function Booking() {
                  throw err;
                 })
     }
+    const viewDetails = (id) =>{
+        const selectedBooking = currentBookings.find(booking => booking._id === id);
+        console.log(selectedBooking)
+        setBookingDetail(selectedBooking);
+    }
+    const modalCancel = () => {
+        setBookingDetail(null);
+    }
+    const modalCancelBooking = () =>{
+        const requestBody = {
+            query : `
+                mutation{
+                    cancelBooking(bookingId:"${bookingDetail._id}"){
+                        _id
+                      }
+                }
+                
+            `
+        }
+        fetch('http://localhost:4000/graphql',{
+                method: 'POST',
+                body: JSON.stringify(requestBody),
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'Authorization': `Bearer ${context.state.token}`
+                }
+            }).then(
+                res => {
+                    if(res.status !== 200 && res.status !==201){ 
+                        console.log(res);                      
+                    }
+                    return res.json();
+                }
+            ).then(data => {
+                fetchBookings();
+                setBookingDetail(null);
+            })
+             .catch(err => {
+                 throw err;
+                })
+    }
 
     useLayoutEffect(fetchBookings,[]);
     return (
         <div>
             <h1>Bookings</h1>
+            {loadingBookings && <Spinner />}
+            {!loadingBookings && <BookingList bookings = {currentBookings} viewDetails={viewDetails} />}
+            {bookingDetail && <>
+                <Backdrop />
+                <Modal title={bookingDetail.event.title}
+                        canCancel 
+                        cancelText = 'Return to Bookings List'
+                        modalCancel = {modalCancel}
+                        canConfirm
+                        confirmText = 'Cancel Booking'
+                        modalConfirm = {modalCancelBooking}>
+                    <h2>${bookingDetail.event.price.toFixed(2)}</h2>
+                    <h3>{new Date(bookingDetail.event.date).toLocaleDateString()}</h3>
+                    <p>{bookingDetail.event.desc}</p>
+                </Modal>
+            </>}
     {currentBookings.length === 0  ? <p>No Bookings</p> : <><p>Bookings detected</p><ul>{currentBookings.map(booking => <li key={booking._id}>{booking.event.title}</li>)}</ul></>}
         </div>
     )

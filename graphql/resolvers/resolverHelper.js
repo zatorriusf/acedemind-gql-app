@@ -51,7 +51,7 @@ const singleEvent = eventId => {
         
 };
 
-//exports.singleEvent = singleEvent;
+exports.singleEvent = singleEvent;
 //exports.events = events;
 //exports.user = user;
 exports.transformEvent = transformEvent;

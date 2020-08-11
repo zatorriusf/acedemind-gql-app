@@ -48,9 +48,9 @@ module.exports = {
 
     },
     cancelBooking :async (args,req) =>{
-        if(!req.isAuth){
+        /*if(!req.isAuth){
             throw new Error('User unauthenticated!')
-          }
+          }*/
         try {
             const booking = await Booking.findById(args.bookingId);
             const event = singleEvent(booking._doc.event);
