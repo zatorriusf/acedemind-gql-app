@@ -65,10 +65,11 @@ export default function Booking() {
         setBookingDetail(null);
     }
     const modalCancelBooking = () =>{
+        const removedBooking = bookingDetail._id
         const requestBody = {
             query : `
                 mutation{
-                    cancelBooking(bookingId:"${bookingDetail._id}"){
+                    cancelBooking(bookingId:"${removedBooking}"){
                         _id
                       }
                 }
@@ -90,7 +91,7 @@ export default function Booking() {
                     return res.json();
                 }
             ).then(data => {
-                fetchBookings();
+                
                 setBookingDetail(null);
             })
              .catch(err => {
